@@ -12,11 +12,9 @@ public class FileTransfom {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		
 		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
-			//list = stream.collect(Collectors.toList());
 			stream.forEach((i) -> list.add(Integer.parseInt(i)));
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
