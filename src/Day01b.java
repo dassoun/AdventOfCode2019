@@ -7,7 +7,6 @@ public class Day01b {
 	public static void main(String[] args) {
 		String fileName = "inputs/day01a.txt";
 		double TotalfuelAmount = 0;
-		double fuelAmount; 
 		
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		list = FileTransfom.fileToIntList(fileName);
