@@ -25,7 +25,8 @@ public class FileTransfom {
 		return list;
 	}
 	
-	public static int[] inLineFileToIntArray(String fileName, String splitString) {
+	
+	public static String[] inLineFileToStringArray(String fileName, String splitString) {
 		String str = "";
 		
 		try (InputStream ips = new FileInputStream(fileName);
@@ -41,10 +42,39 @@ public class FileTransfom {
 			System.out.println(e.toString());
 		}
 		
-		int inputs[] = Arrays.stream(str.split(splitString))
+		String inputs[] = str.split(splitString);
+		
+		return inputs;
+	}
+	
+	
+	public static int[] inLineFileToIntArray(String fileName, String splitString) {
+		String ar[] = inLineFileToStringArray(fileName, splitString);
+		
+		int inputs[] = Arrays.stream(ar)
 		        .mapToInt(Integer::valueOf)
 		        .toArray();
 		
 		return inputs;
+	}
+	
+	
+	public static ArrayList<String> inLineFileToStringArrayList(String fileName) {
+		ArrayList<String> al = new ArrayList<String>();
+		
+		try (InputStream ips = new FileInputStream(fileName);
+				InputStreamReader ipsr = new InputStreamReader(ips);
+				BufferedReader br = new BufferedReader(ipsr)) {
+			
+			String line;
+			while ((line = br.readLine()) != null){
+				al.add(line);
+			}
+			br.close();
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		
+		return al;
 	}
 }
