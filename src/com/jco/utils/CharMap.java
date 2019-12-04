@@ -193,6 +193,16 @@ public class CharMap {
 		for (int i=1; i<=distance; i++) {
 			schema[currentX + i][currentY] = '-';
 			nbMoves++;
+			
+			Point p = new Point(currentX + i, currentY).relativeTo(new Point(startX, startY));
+			if (map.startX + p.getX() >= 0 && map.startX + p.getX() < map.width && 
+					map.startY + p.getY() >= 0 && map.startY + p.getY() < map.height) {
+				if (map.schema[map.startX + p.getX()][map.startY + p.getY()] != '.') {
+					if (!collisions.containsKey(p.getX()+","+p.getY())) {
+						collisions.put(p.getX()+","+p.getY(), nbMoves);
+					}
+				}
+			}
 		}
 		currentX += distance; 
 		
@@ -213,6 +223,16 @@ public class CharMap {
 		for (int i=1; i<=distance; i++) {
 			schema[currentX][currentY + i] = '|';
 			nbMoves++;
+			
+			Point p = new Point(currentX, currentY + i).relativeTo(new Point(startX, startY));
+			if (map.startX + p.getX() >= 0 && map.startX + p.getX() < map.width && 
+					map.startY + p.getY() >= 0 && map.startY + p.getY() < map.height) {
+				if (map.schema[map.startX + p.getX()][map.startY + p.getY()] != '.') {
+					if (!collisions.containsKey(p.getX()+","+p.getY())) {
+						collisions.put(p.getX()+","+p.getY(), nbMoves);
+					}
+				}
+			}
 		}
 		currentY += distance;
 		
@@ -233,6 +253,16 @@ public class CharMap {
 		for (int i=1; i<=distance; i++) {
 			schema[currentX - i][currentY] = '-';
 			nbMoves++;
+			
+			Point p = new Point(currentX - i, currentY).relativeTo(new Point(startX, startY));
+			if (map.startX + p.getX() >= 0 && map.startX + p.getX() < map.width && 
+					map.startY + p.getY() >= 0 && map.startY + p.getY() < map.height) {
+				if (map.schema[map.startX + p.getX()][map.startY + p.getY()] != '.') {
+					if (!collisions.containsKey((map.startX + p.getX())+","+p.getY())) {
+						collisions.put((map.startX + p.getX())+","+p.getY(), nbMoves);
+					}
+				}
+			}
 		}
 		currentX -= distance; 
 		
@@ -253,6 +283,19 @@ public class CharMap {
 		for (int i=1; i<=distance; i++) {
 			schema[currentX][currentY - i] = '|';
 			nbMoves++;
+			
+			Point p = new Point(currentX, currentY - i).relativeTo(new Point(startX, startY));
+			if (map.startX + p.getX() >= 0 && map.startX + p.getX() < map.width && 
+					map.startY + p.getY() >= 0 && map.startY + p.getY() < map.height) {
+				
+				System.out.println("***" + (map.startX + p.getX()) + ", "+ (map.startY + p.getY()));
+				
+				if (map.schema[map.startX + p.getX()][map.startY + p.getY()] != '.') {
+					if (!collisions.containsKey((map.startX + p.getX())+","+p.getY())) {
+						collisions.put((map.startX + p.getX())+","+p.getY(), nbMoves);
+					}
+				}
+			}
 		}
 		currentY -= distance; 
 		
@@ -390,26 +433,30 @@ public class CharMap {
 		return list;
 	}
 	
-	public void moveWithCollisions(String move, CharMap map) {
+	public HashMap<String, Integer> moveWithCollisions(String move, CharMap map) {
+		HashMap<String, Integer> collisions = new HashMap<String, Integer>();
+		
 		String direction = move.substring(0, 1);
 		int len = Integer.valueOf(move.substring(1));
 		
 		switch (direction) {
 			case "R":
-				moveRight(len);
+				collisions = moveRight(len, map);
 				break;
 			case "D":
-				moveDown(len);
+				collisions = moveDown(len, map);
 				break;
 			case "L":
-				moveLeft(len);
+				collisions = moveLeft(len, map);
 				break;
 			case "U":
-				moveUp(len);
+				collisions = moveUp(len, map);
 				break;
 			default:
 				break;
 		}
+		
+		return collisions;
 	}
 	
 	public void display() {
