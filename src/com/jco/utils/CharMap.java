@@ -1,12 +1,17 @@
 package com.jco.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class CharMap {
+	private char symbol;
 	private int startX;
 	private int startY;
 	private int currentX;
 	private int currentY;
 	private int width;
 	private int height;
+	private int nbMoves;
 	
 	private char schema[][];
 
@@ -23,8 +28,9 @@ public class CharMap {
 		schema[currentX][currentY] = 'o';
 	}
 
-	public CharMap(int startX, int startY, int currentX, int currentY, int width, int height, char[][] schema) {
+	public CharMap(char symbol, int startX, int startY, int currentX, int currentY, int width, int height, char[][] schema) {
 		super();
+		this.symbol = symbol;
 		this.startX = startX;
 		this.startY = startY;
 		this.currentX = currentX;
@@ -47,6 +53,14 @@ public class CharMap {
 		schema[currentX][currentY] = 'o';
 		
 		move(move);
+	}
+	
+	public char getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(char symbol) {
+		this.symbol = symbol;
 	}
 
 	public int getStartX() {
@@ -113,6 +127,7 @@ public class CharMap {
 		}
 		for (int i=1; i<=distance; i++) {
 			schema[currentX + i][currentY] = '-';
+			nbMoves++;
 		}
 		currentX += distance; 
 		
@@ -128,8 +143,9 @@ public class CharMap {
 			
 		for (int i=1; i<=distance; i++) {
 			schema[currentX][currentY + i] = '|';
+			nbMoves++;
 		}
-		currentY += distance; 
+		currentY += distance;
 		
 		schema[currentX][currentY] = '+';
 	}
@@ -143,6 +159,7 @@ public class CharMap {
 
 		for (int i=1; i<=distance; i++) {
 			schema[currentX - i][currentY] = '-';
+			nbMoves++;
 		}
 		currentX -= distance; 
 		
@@ -158,10 +175,90 @@ public class CharMap {
 
 		for (int i=1; i<=distance; i++) {
 			schema[currentX][currentY - i] = '|';
+			nbMoves++;
 		}
 		currentY -= distance; 
 		
 		schema[currentX][currentY] = '+';
+	}
+	
+	private HashMap<String, Integer> moveRight(int distance, CharMap map) {
+		HashMap<String, Integer> collisions = new HashMap<String, Integer>();
+		
+		if ((currentX + distance) >= width) {
+			int nbCharToAdd = (currentX + distance) - width + 1;
+			
+			resizeSchema(width + nbCharToAdd, height, "R");
+		}
+		for (int i=1; i<=distance; i++) {
+			schema[currentX + i][currentY] = '-';
+			nbMoves++;
+		}
+		currentX += distance; 
+		
+		schema[currentX][currentY] = '+';
+		
+		return collisions;
+	}
+	
+	private HashMap<String, Integer> moveDown(int distance, CharMap map) {
+		HashMap<String, Integer> collisions = new HashMap<String, Integer>();
+		
+		if ((currentY + distance) >= height) {
+			int nbCharToAdd = (currentY + distance) - height + 1;
+			
+			resizeSchema(width, height + nbCharToAdd, "D");
+		}
+			
+		for (int i=1; i<=distance; i++) {
+			schema[currentX][currentY + i] = '|';
+			nbMoves++;
+		}
+		currentY += distance;
+		
+		schema[currentX][currentY] = '+';
+		
+		return collisions;
+	}
+	
+	private HashMap<String, Integer> moveLeft(int distance, CharMap map) {
+		HashMap<String, Integer> collisions = new HashMap<String, Integer>();
+		
+		if ((currentX - distance) < 0) {
+			int nbCharToAdd = Math.abs(currentX - distance);
+			
+			resizeSchema(width + nbCharToAdd, height, "L");
+		}
+
+		for (int i=1; i<=distance; i++) {
+			schema[currentX - i][currentY] = '-';
+			nbMoves++;
+		}
+		currentX -= distance; 
+		
+		schema[currentX][currentY] = '+';
+		
+		return collisions;
+	}
+	
+	private HashMap<String, Integer> moveUp(int distance, CharMap map) {
+		HashMap<String, Integer> collisions = new HashMap<String, Integer>();
+		
+		if ((currentY - distance) < 0) {
+			int nbCharToAdd = Math.abs(currentY - distance);
+			
+			resizeSchema(width, height + nbCharToAdd, "U");
+		}
+
+		for (int i=1; i<=distance; i++) {
+			schema[currentX][currentY - i] = '|';
+			nbMoves++;
+		}
+		currentY -= distance; 
+		
+		schema[currentX][currentY] = '+';
+		
+		return collisions;
 	}
 	
 	private void resizeSchema(int newWidth, int newHeight, String direction) {
@@ -174,6 +271,7 @@ public class CharMap {
 			}
 		}
 		
+		// Copy old array to the new one
 		switch (direction) {
 			case "R":
 				for (int i=0; i<width; i++) {
@@ -241,6 +339,79 @@ public class CharMap {
 		}
 	}
 	
+	public ArrayList<Point> getPointsToManhattanDistance(Point point, int distance) {
+		ArrayList<Point> list = new ArrayList<Point>();
+		
+		for (int i=0; i<=distance; i++) {
+			int j = distance - i;
+			
+//			list.add(new Point(point.getX() + i, point.getY() + j));
+//			if (j != 0) {
+//				list.add(new Point(point.getX() + i, point.getY() + (j * (-1))));
+//			}
+//			if (i != 0) {
+//				list.add(new Point(point.getX() + (i * (-1)), point.getY() + j));
+//			}
+//			if (i != 0 && j!= 0) {
+//				list.add(new Point(point.getX() + (i * (-1)), point.getY() + (j * (-1))));
+//			}
+					
+					
+			if ((point.getX() + i) < width && (point.getY() + j) < height) {
+				if (schema[point.getX() + i][point.getY() + j] != '.') {
+					list.add(new Point(point.getX() + i, point.getY() + j));
+				}
+			}
+			
+			if (j != 0) {
+				if ((point.getX() + i) < width && (point.getY() + (j * (-1))) >= 0) {
+					if (schema[point.getX() + i][point.getY() + (j * (-1))] != '.') {
+						list.add(new Point(point.getX() + i, point.getY() + (j * (-1))));
+					}
+				}
+			}
+			if (i != 0) {
+				if ((point.getX() + (i * (-1))) >= 0 && (point.getY() + j) < height) {
+					if (schema[point.getX() + (i * (-1))][point.getY() + j] != '.') {
+						list.add(new Point(point.getX() + (i * (-1)), point.getY() + j));
+					}
+					
+				}
+			}
+			if (i != 0 && j!= 0) {
+				if ((point.getX() + (i * (-1))) >= 0 && (point.getY() + (j * (-1))) >= 0) {
+					if (schema[point.getX() + (i * (-1))][point.getY() + (j * (-1))] != '.') {
+						list.add(new Point(point.getX() + (i * (-1)), point.getY() + (j * (-1))));
+					}
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	public void moveWithCollisions(String move, CharMap map) {
+		String direction = move.substring(0, 1);
+		int len = Integer.valueOf(move.substring(1));
+		
+		switch (direction) {
+			case "R":
+				moveRight(len);
+				break;
+			case "D":
+				moveDown(len);
+				break;
+			case "L":
+				moveLeft(len);
+				break;
+			case "U":
+				moveUp(len);
+				break;
+			default:
+				break;
+		}
+	}
+	
 	public void display() {
 		for (int i=0; i<height; i++) {
 			for (int j=0; j<width; j++) {
@@ -252,4 +423,5 @@ public class CharMap {
 		System.out.println();
 		System.out.println("start : (" + startX + ", " + startY + ")");
 	}
+	
 }
