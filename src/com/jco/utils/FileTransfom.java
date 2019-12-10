@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class FileTransfom {
@@ -18,6 +19,18 @@ public class FileTransfom {
 		
 		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 			stream.forEach((i) -> list.add(Integer.parseInt(i)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+	
+	public static ArrayList<String> fileToStringList(String fileName) {
+		ArrayList<String> list = new ArrayList<String>();
+		
+		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+			stream.forEach((i) -> list.add(i));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -76,5 +89,16 @@ public class FileTransfom {
 		}
 		
 		return al;
+	}
+	
+	public static String[] splitEqually(String text, int size) {
+	    // Give the list the right capacity to start with. You could use an array
+	    // instead if you wanted.
+		String[] ret = new String[((text.length() + size - 1) / size)];
+
+	    for (int start = 0; start < text.length(); start += size) {
+	    	ret[start/size] = text.substring(start, Math.min(text.length(), start + size));
+	    }
+	    return ret;
 	}
 }
